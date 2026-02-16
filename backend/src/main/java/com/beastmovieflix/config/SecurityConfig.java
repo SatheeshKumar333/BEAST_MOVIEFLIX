@@ -18,11 +18,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-/**
- * Spring Security Configuration
- * 
- * @author Satheesh Kumar
- */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,19 +30,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                // CORS handled by CorsFilter bean
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth -> auth
-                        // Allow preflight OPTIONS requests
+
+                        // Allow preflight CORS requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Public endpoints
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
-                        .requestMatchers("/api/health").permitAll()
 
                         // Protected endpoints
                         .requestMatchers("/api/user/**").authenticated()
@@ -55,8 +53,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/groups/**").authenticated()
                         .requestMatchers("/api/media/**").authenticated()
 
-                        // All other requests
-                        .anyRequest().authenticated())
+                        // Everything else secured
+                        .anyRequest().authenticated()
+                )
+
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -64,15 +64,23 @@ public class SecurityConfig {
 
     @Bean
     public org.springframework.web.filter.CorsFilter corsFilter() {
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+
+        // IMPORTANT: Must be true if using JWT in Authorization header
         config.setAllowCredentials(true);
-        Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .forEach(config::addAllowedOrigin);
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+
+        // Use addAllowedOriginPattern for flexibility
+        Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .forEach(config::addAllowedOriginPattern);
+
         source.registerCorsConfiguration("/**", config);
+
         return new org.springframework.web.filter.CorsFilter(source);
     }
 
