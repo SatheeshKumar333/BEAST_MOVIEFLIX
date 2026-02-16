@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Register for Beast MovieFlix - Your cinematic movie logging platform" />
+  <title>Register | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+  <style>
+    .validation-hint {
+      font-size: 12px;
+      color: var(--muted-gold);
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .password-strength-container {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+
+<body class="auth-page">
+  <!-- Back Button -->
+  <button class="back-btn auth-back" onclick="window.history.back()" title="Go Back">← Back</button>
+
+  <div class="auth-box">
+    <a href="../index.html" class="auth-logo-link">
+      <img src="../assets/images/beast-movieflix-logo.png" class="auth-logo" alt="Beast MovieFlix Logo" />
+    </a>
+    <h1 class="auth-brand">Beast MovieFlix</h1>
+    <h2>Create Account</h2>
+    <p class="auth-subtitle">Join the cinematic community</p>
+
+    <div id="authError" class="auth-error" style="display:none;"></div>
+
+    <form onsubmit="event.preventDefault(); register();">
+      <input type="text" id="regUsername" placeholder="Username (3-10 characters)" required maxlength="10" />
+      <p class="validation-hint">Letters, numbers, underscore only</p>
+
+      <input type="email" id="regEmail" placeholder="Email" required />
+      <p class="validation-hint">OTP will be sent to verify your email</p>
+
+      <input type="password" id="regPassword" placeholder="Password (8+ chars)" required minlength="8" />
+      <div class="password-strength-container">
+        <div id="passwordStrength" class="password-strength-bar"></div>
+      </div>
+      <p class="validation-hint">Must contain 1 uppercase letter & 1 number</p>
+
+      <input type="password" id="regConfirmPassword" placeholder="Confirm Password" required minlength="8" />
+
+      <button type="submit" class="btn primary">Register 🚀</button>
+    </form>
+
+    <div class="auth-links">
+      <p>Already have an account? <a href="login.html">Login here</a></p>
+      <a href="home.html" class="guest-link">Continue as Guest</a>
+    </div>
+
+    <p class="auth-footer">Developed by <strong>Satheesh Kumar</strong></p>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    if (localStorage.getItem("bmf_logged") === "true") {
+      window.location.href = "home.html";
+    }
+  </script>
+</body>
+
+</html>

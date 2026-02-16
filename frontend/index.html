@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Beast MovieFlix</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <style>
+    .landing-actions,
+    .landing-actions * {
+      border-bottom: none !important;
+      outline: none !important;
+    }
+  </style>
+</head>
+
+<body class="landing">
+  <div class="landing-overlay">
+    <img src="assets/images/beast-movieflix-logo.png" class="landing-logo" />
+
+    <h1>Beast MovieFlix</h1>
+    <p class="tagline">
+      A Cinematic Movie Logging & Social Discovery Platform
+    </p>
+
+    <div class="landing-actions">
+      <a href="pages/login.html" class="btn primary">Login</a>
+      <a href="pages/register.html" class="btn secondary">Register</a>
+      <a href="pages/home.html" class="btn outline">Just Visit</a>
+    </div>
+
+    <footer class="credit">
+      Developed by <strong>Satheesh Kumar</strong>
+    </footer>
+  </div>
+  <script>
+    if (localStorage.getItem("bmf_logged") === "true") {
+      window.location.href = "pages/home.html";
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Your personal movie dashboard on Beast MovieFlix" />
+  <title>Dashboard | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/diary-filters.css" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+  <div id="header"></div>
+  <div id="profile-panel-container"></div>
+
+  <main class="dashboard-page">
+    <div class="dashboard-container">
+      <!-- Profile Section -->
+      <section id="profileSection" class="dash-section"></section>
+
+      <!-- Stats Section -->
+      <section id="statsSection" class="dash-section"></section>
+
+      <!-- Favourites Section -->
+      <section id="favouritesSection" class="dash-section"></section>
+
+      <!-- Diary Section -->
+      <section id="diarySection" class="dash-section"></section>
+
+      <!-- Watchlist Section -->
+      <section id="watchlistSection" class="dash-section"></section>
+    </div>
+  </main>
+
+  <footer class="credit">Developed by <strong>Satheesh Kumar</strong></footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/dashboard.js"></script>
+
+  <script>
+    async function loadComponents() {
+      const headerRes = await fetch("../components/header.html");
+      document.getElementById("header").innerHTML = await headerRes.text();
+
+      const panelRes = await fetch("../components/profile-panel.html");
+      document.getElementById("profile-panel-container").innerHTML = await panelRes.text();
+
+      initHeader();
+      initializeProfilePanel();
+    }
+
+    function initializeProfilePanel() {
+      const logged = localStorage.getItem("bmf_logged") === "true";
+      const username = localStorage.getItem("bmf_user") || "Guest";
+      const email = localStorage.getItem("bmf_email") || "";
+
+      const usernameEl = document.getElementById("profileUsername");
+      const emailEl = document.getElementById("profileEmail");
+      const initialEl = document.getElementById("profileInitial");
+      const loggedInActions = document.getElementById("loggedInActions");
+      const guestActions = document.getElementById("guestActions");
+
+      if (usernameEl) usernameEl.textContent = username;
+      if (emailEl) emailEl.textContent = email || (logged ? "No email set" : "Not logged in");
+      if (initialEl) initialEl.textContent = username.charAt(0).toUpperCase();
+
+      if (logged) {
+        if (loggedInActions) loggedInActions.style.display = "block";
+        if (guestActions) guestActions.style.display = "none";
+      } else {
+        if (loggedInActions) loggedInActions.style.display = "none";
+        if (guestActions) guestActions.style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadComponents);
+  </script>
+</body>
+
+</html>

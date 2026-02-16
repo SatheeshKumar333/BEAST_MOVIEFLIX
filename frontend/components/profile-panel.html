@@ -1,0 +1,59 @@
+<!-- ================================
+     BEAST MOVIEFLIX – PROFILE PANEL
+     Developed by Satheesh Kumar
+================================ -->
+
+<!-- Overlay -->
+<div class="profile-overlay" onclick="toggleProfilePanel()"></div>
+
+<aside class="profile-panel" id="profilePanel">
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="profile-pic">
+      <span id="profileInitial">G</span>
+    </div>
+    <div class="profile-info">
+      <h4 id="profileUsername">Guest</h4>
+      <span id="profileEmail">Not logged in</span>
+    </div>
+  </div>
+
+  <!-- LOGGED IN ACTIONS -->
+  <nav class="profile-actions" id="loggedInActions" style="display: none;">
+    <a href="dashboard.html">
+      <span class="action-icon">📊</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="edit-profile.html">
+      <span class="action-icon">✏️</span>
+      <span>Edit Profile</span>
+    </a>
+    <a href="profile.html">
+      <span class="action-icon">👤</span>
+      <span>My Profile</span>
+    </a>
+    <a href="log-movie.html">
+      <span class="action-icon">✍️</span>
+      <span>Log Movie</span>
+    </a>
+    <a href="friends.html">
+      <span class="action-icon">👥</span>
+      <span>Friends & Groups</span>
+    </a>
+    <div class="divider"></div>
+    <a href="#" class="logout" onclick="logout(); return false;">
+      <span class="action-icon">🚪</span>
+      <span>Logout</span>
+    </a>
+  </nav>
+
+  <!-- Guest Actions -->
+  <div class="guest-actions" id="guestActions" style="display: block;">
+    <p>Login to access all features</p>
+    <a href="login.html" class="btn primary">Login</a>
+    <a href="register.html" class="btn outline">Register</a>
+  </div>
+
+  <!-- CREDIT -->
+  <div class="profile-credit">Developed by <strong>Satheesh Kumar</strong></div>
+</aside>

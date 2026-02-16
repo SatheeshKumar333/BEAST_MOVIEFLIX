@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="User Profile | Beast MovieFlix" />
+    <title>User Profile | Beast MovieFlix</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/home.css" />
+    <link rel="stylesheet" href="../css/profile.css" />
+    <style>
+        .profile-page-container {
+            max-width: 800px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+
+        .profile-header-card {
+            background: linear-gradient(145deg, #1a1a1a, #222);
+            border-radius: 16px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .profile-avatar-large {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 32px;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .verified-badge {
+            color: #1da1f2;
+            font-size: 24px;
+        }
+
+        .bio {
+            color: #aaa;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .stat span {
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 20px;
+            }
+
+            .profile-info h1 {
+                justify-content: center;
+            }
+
+            .stats-row {
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .profile-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header"></div>
+    <div id="profile-panel-container"></div>
+
+    <main class="profile-page-container">
+        <div id="fullProfilePanel">
+            <!-- Content loaded by JS -->
+            <div style="text-align:center; padding: 50px; color: #666;">Loading profile...</div>
+        </div>
+    </main>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/profile.js"></script>
+    <script src="../js/header.js"></script>
+
+    <script>
+        async function loadComponents() {
+            const headerRes = await fetch("../components/header.html");
+            document.getElementById("header").innerHTML = await headerRes.text();
+
+            const panelRes = await fetch("../components/profile-panel.html");
+            document.getElementById("profile-panel-container").innerHTML = await panelRes.text();
+
+            initHeader();
+            // Initialize the shared profile panel
+            if (typeof initializeProfilePanel === 'function') {
+                initializeProfilePanel();
+            }
+
+            // Initialize the FULL profile page logic (defined in profile.js)
+            if (typeof renderFullProfilePage === 'function') {
+                renderFullProfilePage();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadComponents);
+    </script>
+</body>
+
+</html>

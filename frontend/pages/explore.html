@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Explore world cinema industries on Beast MovieFlix" />
+  <title>Explore | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/explore.css" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+  <div id="header"></div>
+  <div id="profile-panel-container"></div>
+
+  <main class="explore-page">
+    <!-- Woods Grid Section -->
+    <section id="woodsGridSection" class="woods-grid-section">
+      <div class="explore-hero">
+        <h1>🌍 Explore World Cinema</h1>
+        <p>Discover the greatest film industries from around the globe</p>
+      </div>
+
+      <div class="woods-grid" id="woodsGrid">
+        <!-- Dynamic wood cards -->
+      </div>
+    </section>
+
+    <!-- Wood Details Section (Hidden Initially) -->
+    <section id="woodDetailsSection" class="wood-details-section" style="display: none;">
+      <div id="woodDetailsHeader"></div>
+      <div id="woodMoviesContainer"></div>
+      <div id="woodActorsContainer"></div>
+    </section>
+  </main>
+
+  <footer class="credit">Developed by <strong>Satheesh Kumar</strong></footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/explore.js"></script>
+
+  <script>
+    async function loadComponents() {
+      // Load header
+      const headerRes = await fetch("../components/header.html");
+      document.getElementById("header").innerHTML = await headerRes.text();
+
+      // Load profile panel
+      const panelRes = await fetch("../components/profile-panel.html");
+      document.getElementById("profile-panel-container").innerHTML = await panelRes.text();
+
+      // Initialize header (search, auth, avatar)
+      initHeader();
+
+      // Initialize profile panel
+      initializeProfilePanel();
+    }
+
+    function initializeProfilePanel() {
+      const logged = localStorage.getItem("bmf_logged") === "true";
+      const username = localStorage.getItem("bmf_user") || "Guest";
+      const email = localStorage.getItem("bmf_email") || "";
+
+      const usernameEl = document.getElementById("profileUsername");
+      const emailEl = document.getElementById("profileEmail");
+      const initialEl = document.getElementById("profileInitial");
+      const loggedInActions = document.getElementById("loggedInActions");
+      const guestActions = document.getElementById("guestActions");
+
+      if (usernameEl) usernameEl.textContent = username;
+      if (emailEl) emailEl.textContent = email || (logged ? "No email set" : "Not logged in");
+      if (initialEl) initialEl.textContent = username.charAt(0).toUpperCase();
+
+      if (logged) {
+        if (loggedInActions) loggedInActions.style.display = "block";
+        if (guestActions) guestActions.style.display = "none";
+      } else {
+        if (loggedInActions) loggedInActions.style.display = "none";
+        if (guestActions) guestActions.style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadComponents);
+  </script>
+</body>
+
+</html>

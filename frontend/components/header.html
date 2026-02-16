@@ -1,0 +1,215 @@
+<!-- ================================
+     BEAST MOVIEFLIX – GLOBAL HEADER
+     Developed by Satheesh Kumar
+================================ -->
+
+<header class="header">
+  <!-- BACK BUTTON -->
+  <button class="back-btn" onclick="goBack()" title="Go Back">←</button>
+
+  <!-- LOGO / BRAND (Safe Home Button) -->
+  <a href="home.html" class="brand">
+    <img src="../assets/images/beast-movieflix-logo.png" alt="Beast MovieFlix Logo" />
+    <span>Beast MovieFlix</span>
+  </a>
+
+  <!-- NAVIGATION LINKS -->
+  <nav class="nav-links">
+    <a href="home.html">🏠 Home</a>
+    <a href="log-movie.html" class="auth-only">✍️ Log Movie</a>
+    <a href="friends.html" class="auth-only">👥 Friends</a>
+    <a href="explore.html">🌍 Explore</a>
+    <a href="admin.html" class="admin-only" id="adminNavLink" style="display:none;">👑 Admin</a>
+  </nav>
+
+  <!-- GLOBAL SEARCH -->
+  <div class="search-wrapper">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="globalSearch" placeholder="Search movies, series, cast..." autocomplete="off" />
+      <button class="search-clear" id="searchClear" style="display: none;">×</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- PROFILE AVATAR -->
+  <div class="header-profile">
+    <div class="avatar" onclick="toggleProfilePanel()" title="Profile">
+      <span id="avatarInitial"></span>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Initialize header
+  document.addEventListener("DOMContentLoaded", () => {
+    const logged = localStorage.getItem("bmf_logged") === "true";
+    const username = localStorage.getItem("bmf_user") || "G";
+    const role = localStorage.getItem("bmf_role");
+
+    // Hide auth-only links for guests
+    document.querySelectorAll(".auth-only").forEach(el => {
+      if (!logged) el.style.display = "none";
+    });
+
+    // Show admin link only for ADMIN users
+    const adminLink = document.getElementById("adminNavLink");
+    if (adminLink && logged && role === "ADMIN") {
+      adminLink.style.display = "inline-flex";
+    }
+
+    // Set avatar initial
+    const avatarInitial = document.getElementById("avatarInitial");
+    if (avatarInitial) {
+      avatarInitial.textContent = username.charAt(0).toUpperCase();
+    }
+
+    // Global search functionality
+    const searchInput = document.getElementById("globalSearch");
+    const searchResults = document.getElementById("searchResults");
+    const searchClear = document.getElementById("searchClear");
+    let searchTimeout;
+
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim();
+        searchClear.style.display = query ? "block" : "none";
+
+        clearTimeout(searchTimeout);
+        if (query.length < 2) {
+          searchResults.innerHTML = "";
+          searchResults.classList.remove("show");
+          return;
+        }
+
+        searchTimeout = setTimeout(() => performSearch(query), 300);
+      });
+
+      searchInput.addEventListener("focus", () => {
+        if (searchInput.value.trim().length >= 2) {
+          searchResults.classList.add("show");
+        }
+      });
+    }
+
+    if (searchClear) {
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        searchResults.innerHTML = "";
+        searchResults.classList.remove("show");
+        searchClear.style.display = "none";
+      });
+    }
+
+    // Close search on outside click
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-wrapper")) {
+        searchResults?.classList.remove("show");
+      }
+    });
+  });
+
+  // Perform search
+  async function performSearch(query) {
+    const searchResults = document.getElementById("searchResults");
+
+    try {
+      // Search movies
+      const movieRes = await fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+      const movieData = await movieRes.json();
+
+      // Search TV
+      const tvRes = await fetch(`${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+      const tvData = await tvRes.json();
+
+      // Search Person
+      const personRes = await fetch(`${TMDB_BASE_URL}/search/person?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+      const personData = await personRes.json();
+
+      // Combine results
+      const movies = movieData.results?.slice(0, 4) || [];
+      const tvShows = tvData.results?.slice(0, 3) || [];
+      const people = personData.results?.slice(0, 3) || [];
+
+      let html = "";
+
+      if (movies.length > 0) {
+        html += `<div class="search-category"><span>🎬 Movies</span></div>`;
+        movies.forEach(m => {
+          const poster = m.poster_path ? `${TMDB_IMG_W185}${m.poster_path}` : "";
+          const year = m.release_date?.split("-")[0] || "";
+          html += `
+          <div class="search-item" onclick="goToDetails(${m.id}, 'movie')">
+            ${poster ? `<img src="${poster}" alt="${m.title}" />` : `<div class="no-poster">🎬</div>`}
+            <div class="search-item-info">
+              <span class="title">${m.title}</span>
+              <span class="year">${year}</span>
+            </div>
+            ${localStorage.getItem("bmf_logged") === "true" ? `<button class="quick-log" onclick="event.stopPropagation(); quickLog(${m.id}, 'movie', '${escapeHtml(m.title)}')">✍️</button>` : ""}
+          </div>
+        `;
+        });
+      }
+
+      if (tvShows.length > 0) {
+        html += `<div class="search-category"><span>📺 TV Series</span></div>`;
+        tvShows.forEach(t => {
+          const poster = t.poster_path ? `${TMDB_IMG_W185}${t.poster_path}` : "";
+          const year = t.first_air_date?.split("-")[0] || "";
+          html += `
+          <div class="search-item" onclick="goToDetails(${t.id}, 'tv')">
+            ${poster ? `<img src="${poster}" alt="${t.name}" />` : `<div class="no-poster">📺</div>`}
+            <div class="search-item-info">
+              <span class="title">${t.name}</span>
+              <span class="year">${year}</span>
+            </div>
+            ${localStorage.getItem("bmf_logged") === "true" ? `<button class="quick-log" onclick="event.stopPropagation(); quickLog(${t.id}, 'tv', '${escapeHtml(t.name)}')">✍️</button>` : ""}
+          </div>
+        `;
+        });
+      }
+
+      if (people.length > 0) {
+        html += `<div class="search-category"><span>👤 People</span></div>`;
+        people.forEach(p => {
+          const photo = p.profile_path ? `${TMDB_IMG_W185}${p.profile_path}` : "";
+          html += `
+          <div class="search-item person" onclick="alert('Person details coming soon!')">
+            ${photo ? `<img src="${photo}" alt="${p.name}" />` : `<div class="no-poster">👤</div>`}
+            <div class="search-item-info">
+              <span class="title">${p.name}</span>
+              <span class="year">${p.known_for_department || ""}</span>
+            </div>
+          </div>
+        `;
+        });
+      }
+
+      if (!html) {
+        html = `<div class="no-results">No results found for "${query}"</div>`;
+      }
+
+      searchResults.innerHTML = html;
+      searchResults.classList.add("show");
+    } catch (err) {
+      console.error("Search error:", err);
+      searchResults.innerHTML = `<div class="no-results">Search failed. Please try again.</div>`;
+      searchResults.classList.add("show");
+    }
+  }
+
+  // Navigate to details
+  function goToDetails(id, type) {
+    window.location.href = `movie-details.html?id=${id}&type=${type}`;
+  }
+
+  // Quick log from search
+  function quickLog(id, type, title) {
+    window.location.href = `log-movie.html?id=${id}&type=${type}&title=${encodeURIComponent(title)}`;
+  }
+
+  // Escape HTML
+  function escapeHtml(text) {
+    return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+</script>

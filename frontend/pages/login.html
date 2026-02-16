@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Login to Beast MovieFlix - Your cinematic movie logging platform" />
+  <title>Login | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+</head>
+
+<body class="auth-page">
+  <!-- Back Button -->
+  <button class="back-btn auth-back" onclick="window.history.back()" title="Go Back">← Back</button>
+
+  <div class="auth-box">
+    <a href="../index.html" class="auth-logo-link">
+      <img src="../assets/images/beast-movieflix-logo.png" class="auth-logo" alt="Beast MovieFlix Logo" />
+    </a>
+    <h1 class="auth-brand">Beast MovieFlix</h1>
+    <h2>Welcome Back</h2>
+    <p class="auth-subtitle">Login to continue your movie journey</p>
+
+    <div id="authError" class="auth-error" style="display:none;"></div>
+
+    <form onsubmit="event.preventDefault(); login();">
+      <input type="text" id="loginUsername" placeholder="Username or Email" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button type="submit" class="btn primary">Login 🚀</button>
+    </form>
+
+    <div class="auth-links">
+      <p>Don't have an account? <a href="register.html">Register here</a></p>
+      <a href="home.html" class="guest-link">Continue as Guest</a>
+    </div>
+
+    <p class="auth-footer">Developed by <strong>Satheesh Kumar</strong></p>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    if (localStorage.getItem("bmf_logged") === "true") {
+      window.location.href = "home.html";
+    }
+  </script>
+</body>
+
+</html>

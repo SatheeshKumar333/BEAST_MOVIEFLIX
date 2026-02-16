@@ -1,0 +1,180 @@
+/* =========================================
+   PROFILE PANEL & AVATAR – BEAST MOVIEFLIX
+   Developed by Satheesh Kumar
+========================================= */
+
+/* ---------- PROFILE AVATAR (HEADER) ---------- */
+header .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.5);
+  transition: all 0.3s ease;
+}
+
+header .avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.7);
+}
+
+/* ---------- PROFILE PANEL ---------- */
+.profile-panel {
+  position: fixed;
+  top: 64px;
+  right: -340px;
+  width: 320px;
+  height: calc(100vh - 64px);
+  background: linear-gradient(180deg, #0a1628, #020617);
+  padding: 28px 24px;
+  box-shadow: -25px 0 70px rgba(0, 0, 0, 0.7);
+  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profile-panel.open {
+  right: 0;
+}
+
+/* ---------- PROFILE HEADER ---------- */
+.profile-panel .profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-panel .profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--ember));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-panel .profile-pic span {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000;
+}
+
+.profile-panel .profile-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 17px;
+  color: var(--gold);
+}
+
+.profile-panel .profile-info span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- PROFILE ACTIONS ---------- */
+.profile-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-panel a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--white);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.profile-panel a:hover {
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(239, 68, 68, 0.08));
+  border-color: rgba(250, 204, 21, 0.2);
+  transform: translateX(6px);
+}
+
+.profile-panel a .action-icon {
+  font-size: 18px;
+}
+
+.profile-panel .divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 12px 0;
+}
+
+/* ---------- LOGOUT SPECIAL ---------- */
+.profile-panel a.logout {
+  margin-top: auto;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(250, 204, 21, 0.08));
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: var(--ember);
+}
+
+.profile-panel a.logout:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: var(--ember);
+}
+
+/* ---------- GUEST ACTIONS ---------- */
+.guest-actions {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.guest-actions p {
+  color: var(--muted);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.guest-actions .btn {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+/* ---------- OVERLAY ---------- */
+.profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.profile-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ---------- PROFILE CREDIT ---------- */
+.profile-credit {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: auto;
+}
+
+.profile-credit strong {
+  color: var(--gold);
+}

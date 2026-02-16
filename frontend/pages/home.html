@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Home | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/home.css" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+  <div id="header"></div>
+  <div id="profile-panel-container"></div>
+
+  <div class="home-container">
+    <section class="section">
+      <h2>🌍 Top 10 Trending Movies – Worldwide</h2>
+      <div class="card-row" id="ww-movies"></div>
+    </section>
+
+    <section class="section">
+      <h2>🌍 Top 10 Trending Series – Worldwide</h2>
+      <div class="card-row" id="ww-series"></div>
+    </section>
+
+    <section class="section">
+      <h2>🇮🇳 Top 10 Trending Movies – India</h2>
+      <div class="card-row" id="in-movies"></div>
+    </section>
+
+    <section class="section">
+      <h2>🇮🇳 Top 10 Trending Series – India</h2>
+      <div class="card-row" id="in-series"></div>
+    </section>
+
+    <section class="section">
+      <h2>🎥 Tollywood – Top 10 Trending Telugu Movies</h2>
+      <div class="card-row" id="tollywood"></div>
+    </section>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/actions.js"></script> <!-- Shared Actions -->
+  <script src="../js/auth.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/home.js"></script>
+
+  <script>
+    // Load header and profile panel, then initialize them
+    async function loadComponents() {
+      // Load header
+      const headerRes = await fetch("../components/header.html");
+      const headerHtml = await headerRes.text();
+      document.getElementById("header").innerHTML = headerHtml;
+
+      // Load profile panel
+      const panelRes = await fetch("../components/profile-panel.html");
+      const panelHtml = await panelRes.text();
+      document.getElementById("profile-panel-container").innerHTML = panelHtml;
+
+      // Initialize header (search, auth links, avatar)
+      initHeader();
+
+      // Initialize profile panel
+      initializeProfilePanel();
+    }
+
+    // Initialize profile panel with user data
+    function initializeProfilePanel() {
+      const logged = localStorage.getItem("bmf_logged") === "true";
+      const username = localStorage.getItem("bmf_user") || "Guest";
+      const email = localStorage.getItem("bmf_email") || "";
+
+      // Update profile info
+      const usernameEl = document.getElementById("profileUsername");
+      const emailEl = document.getElementById("profileEmail");
+      const initialEl = document.getElementById("profileInitial");
+      const loggedInActions = document.getElementById("loggedInActions");
+      const guestActions = document.getElementById("guestActions");
+
+      if (usernameEl) usernameEl.textContent = username;
+      if (emailEl) emailEl.textContent = email || (logged ? "No email set" : "Not logged in");
+      if (initialEl) initialEl.textContent = username.charAt(0).toUpperCase();
+
+      // Show/hide based on login status
+      if (logged) {
+        if (loggedInActions) loggedInActions.style.display = "block";
+        if (guestActions) guestActions.style.display = "none";
+      } else {
+        if (loggedInActions) loggedInActions.style.display = "none";
+        if (guestActions) guestActions.style.display = "block";
+      }
+    }
+
+    // Load components when DOM is ready
+    document.addEventListener("DOMContentLoaded", loadComponents);
+  </script>
+</body>
+
+</html>

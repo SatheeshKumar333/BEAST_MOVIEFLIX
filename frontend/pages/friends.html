@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Connect with friends and create movie groups on Beast MovieFlix" />
+  <title>Friends | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/friends.css" />
+  <link rel="stylesheet" href="../css/chat-telegram.css" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+  <div id="header"></div>
+  <div id="profile-panel-container"></div>
+
+  <main class="friends-page">
+    <!-- Main View -->
+    <div id="friendsMainView" class="friends-container">
+      <h1>👥 Friends & Groups</h1>
+      <p class="page-subtitle">Connect with movie lovers and discuss your favorites</p>
+
+      <div class="friends-grid">
+        <!-- Groups Section -->
+        <section class="friends-section groups-section">
+          <h2>🎬 My Groups</h2>
+          <div id="groupsContainer"></div>
+        </section>
+
+        <!-- Followers Section -->
+        <section class="friends-section">
+          <h2>👥 Followers</h2>
+          <div id="followersContainer"></div>
+        </section>
+
+        <!-- Following Section -->
+        <section class="friends-section">
+          <h2>👤 Following</h2>
+          <div id="followingContainer"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Group Chat View (Hidden Initially) -->
+    <div id="groupChatView" class="group-chat-container" style="display: none;">
+      <div id="groupChatContent"></div>
+    </div>
+
+    <!-- Create Group Modal -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+    <div id="groupModal" class="modal">
+      <h3>Create New Group</h3>
+      <input type="text" id="groupNameInput" placeholder="Enter group name..." />
+
+      <div class="search-input-wrapper">
+        <input type="text" id="groupMemberInput" placeholder="Add members..." autocomplete="off" />
+        <div id="groupMemberSuggestions" class="suggestions-dropdown"></div>
+      </div>
+      <div id="selectedGroupMembers" class="selected-members"></div>
+
+      <div class="modal-actions">
+        <button class="btn outline" onclick="hideGroupModal()">Cancel</button>
+        <button class="btn primary" id="createGroupBtn">Create</button>
+      </div>
+    </div>
+
+    <!-- Add Person Modal -->
+    <div id="addPersonModal" class="modal">
+      <h3>Add Person to Group</h3>
+      <div class="search-input-wrapper">
+        <input type="text" id="addPersonInput" placeholder="Search username..." autocomplete="off" />
+        <div id="userSuggestions" class="suggestions-dropdown"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn outline" onclick="closeAddPersonModal()">Cancel</button>
+        <button class="btn primary" onclick="addPersonToGroup()">Add</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="credit">Developed by <strong>Satheesh Kumar</strong></footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/friends.js"></script>
+
+  <script>
+    async function loadComponents() {
+      const headerRes = await fetch("../components/header.html");
+      document.getElementById("header").innerHTML = await headerRes.text();
+
+      const panelRes = await fetch("../components/profile-panel.html");
+      document.getElementById("profile-panel-container").innerHTML = await panelRes.text();
+
+      initHeader();
+      initializeProfilePanel();
+    }
+
+    function initializeProfilePanel() {
+      const logged = localStorage.getItem("bmf_logged") === "true";
+      const username = localStorage.getItem("bmf_user") || "Guest";
+      const email = localStorage.getItem("bmf_email") || "";
+
+      const usernameEl = document.getElementById("profileUsername");
+      const emailEl = document.getElementById("profileEmail");
+      const initialEl = document.getElementById("profileInitial");
+      const loggedInActions = document.getElementById("loggedInActions");
+      const guestActions = document.getElementById("guestActions");
+
+      if (usernameEl) usernameEl.textContent = username;
+      if (emailEl) emailEl.textContent = email || (logged ? "No email set" : "Not logged in");
+      if (initialEl) initialEl.textContent = username.charAt(0).toUpperCase();
+
+      if (logged) {
+        if (loggedInActions) loggedInActions.style.display = "block";
+        if (guestActions) guestActions.style.display = "none";
+      } else {
+        if (loggedInActions) loggedInActions.style.display = "none";
+        if (guestActions) guestActions.style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadComponents);
+  </script>
+</body>
+
+</html>

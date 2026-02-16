@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Log your movie experience on Beast MovieFlix" />
+  <title>Log Movie | Beast MovieFlix</title>
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/log-movie.css" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+  <div id="header"></div>
+  <div id="profile-panel-container"></div>
+
+  <main class="log-page">
+    <section class="log-container">
+      <h1>✍️ Log a Movie or Series</h1>
+      <p class="log-subtitle">Record what you watched and share your thoughts</p>
+
+      <!-- Movie Search -->
+      <div class="movie-search-wrapper">
+        <label>Search Movie or Series</label>
+        <input type="text" id="movieSearch" placeholder="Type to search..." />
+        <div class="movie-search-results" id="movieSearchResults"></div>
+      </div>
+
+      <!-- Selected Movie Card -->
+      <div id="selectedMovieCard"></div>
+
+      <!-- Review -->
+      <div class="form-group">
+        <label>Your Review</label>
+        <textarea id="reviewText"
+          placeholder="What did you think about this movie/series? Share your thoughts..."></textarea>
+      </div>
+
+      <!-- Emoji Rating -->
+      <div class="form-group">
+        <label>Your Rating <span id="ratingValue"></span></label>
+        <div class="emoji-rating">
+          <span data-rate="1" title="1 - Awful">😡</span>
+          <span data-rate="2" title="2 - Bad">😕</span>
+          <span data-rate="3" title="3 - Meh">😐</span>
+          <span data-rate="4" title="4 - Okay">🙂</span>
+          <span data-rate="5" title="5 - Good">😄</span>
+          <span data-rate="6" title="6 - Great">🔥</span>
+          <span data-rate="7" title="7 - Excellent">💥</span>
+          <span data-rate="8" title="8 - Amazing">🤯</span>
+          <span data-rate="9" title="9 - Masterpiece">👑</span>
+          <span data-rate="10" title="10 - BEAST MODE">🐺</span>
+        </div>
+      </div>
+
+      <!-- Language & Date -->
+      <div class="form-row">
+        <div class="form-group half">
+          <label>Language Watched</label>
+          <input type="text" id="languageWatched" placeholder="e.g., Telugu, English..." list="languages" />
+          <datalist id="languages">
+            <option value="English"></option>
+            <option value="Telugu"></option>
+            <option value="Hindi"></option>
+            <option value="Tamil"></option>
+            <option value="Malayalam"></option>
+            <option value="Kannada"></option>
+            <option value="Spanish"></option>
+            <option value="French"></option>
+            <option value="Korean"></option>
+            <option value="Japanese"></option>
+          </datalist>
+        </div>
+        <div class="form-group half">
+          <label>When Did You Watch?</label>
+          <input type="datetime-local" id="logTime" />
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <button id="saveLogBtn" class="btn primary save-log-btn">
+        🎬 Save to My Diary
+      </button>
+    </section>
+  </main>
+
+  <footer class="credit">Developed by <strong>Satheesh Kumar</strong></footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/header.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/log-movie.js"></script>
+
+  <script>
+    async function loadComponents() {
+      const headerRes = await fetch("../components/header.html");
+      document.getElementById("header").innerHTML = await headerRes.text();
+
+      const panelRes = await fetch("../components/profile-panel.html");
+      document.getElementById("profile-panel-container").innerHTML = await panelRes.text();
+
+      initHeader();
+      initializeProfilePanel();
+    }
+
+    function initializeProfilePanel() {
+      const logged = localStorage.getItem("bmf_logged") === "true";
+      const username = localStorage.getItem("bmf_user") || "Guest";
+      const email = localStorage.getItem("bmf_email") || "";
+
+      const usernameEl = document.getElementById("profileUsername");
+      const emailEl = document.getElementById("profileEmail");
+      const initialEl = document.getElementById("profileInitial");
+      const loggedInActions = document.getElementById("loggedInActions");
+      const guestActions = document.getElementById("guestActions");
+
+      if (usernameEl) usernameEl.textContent = username;
+      if (emailEl) emailEl.textContent = email || (logged ? "No email set" : "Not logged in");
+      if (initialEl) initialEl.textContent = username.charAt(0).toUpperCase();
+
+      if (logged) {
+        if (loggedInActions) loggedInActions.style.display = "block";
+        if (guestActions) guestActions.style.display = "none";
+      } else {
+        if (loggedInActions) loggedInActions.style.display = "none";
+        if (guestActions) guestActions.style.display = "block";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadComponents);
+  </script>
+</body>
+
+</html>

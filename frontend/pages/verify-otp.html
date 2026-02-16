@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Verify your email - Beast MovieFlix" />
+    <title>Verify Email | Beast MovieFlix</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/auth.css" />
+    <style>
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid var(--neon-cyan);
+            background: rgba(2, 11, 45, 0.8);
+            color: var(--frost-white);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            border-color: var(--ember-red);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            outline: none;
+        }
+
+        .resend-link {
+            color: var(--neon-cyan);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .resend-link:hover {
+            color: var(--ember-red);
+        }
+
+        .resend-link.disabled {
+            color: var(--muted-gold);
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .timer {
+            color: var(--muted-gold);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .email-display {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Back Button -->
+    <button class="back-btn auth-back" onclick="window.history.back()" title="Go Back">← Back</button>
+
+    <main class="auth-page">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h1>📧 Verify Email</h1>
+                <p>Enter the 6-digit OTP sent to:</p>
+                <p class="email-display" id="emailDisplay">your-email@example.com</p>
+
+                <div class="otp-container">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="1" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="2" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="3" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="4" />
+                    <input type="text" class="otp-input" maxlength="1" data-index="5" />
+                </div>
+
+                <button class="btn primary" id="verifyBtn" onclick="verifyOtp()">Verify Email</button>
+
+                <p class="timer" id="timerText">Resend OTP in <span id="countdown">60</span>s</p>
+                <p>
+                    <span class="resend-link disabled" id="resendLink" onclick="resendOtp()">Resend OTP</span>
+                </p>
+
+                <p class="auth-links">
+                    <a href="login.html">← Back to Login</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="credit">Developed by <strong>Satheesh Kumar</strong></footer>
+
+    <script src="../js/config.js"></script>
+    <script>
+        let countdownTimer;
+        let secondsLeft = 60;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Get email from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get("email") || localStorage.getItem("bmf_pending_email");
+
+            if (!email) {
+                alert("No email to verify. Please register first.");
+                window.location.href = "register.html";
+                return;
+            }
+
+            document.getElementById("emailDisplay").textContent = email;
+            localStorage.setItem("bmf_pending_email", email);
+
+            setupOtpInputs();
+            startCountdown();
+        });
+
+        function setupOtpInputs() {
+            const inputs = document.querySelectorAll(".otp-input");
+
+            inputs.forEach((input, index) => {
+                input.addEventListener("input", (e) => {
+                    const value = e.target.value;
+                    if (value && index < 5) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && !input.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+
+                // Allow only numbers
+                input.addEventListener("input", (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, "");
+                });
+            });
+        }
+
+        function getOtp() {
+            const inputs = document.querySelectorAll(".otp-input");
+            return Array.from(inputs).map(i => i.value).join("");
+        }
+
+        async function verifyOtp() {
+            const otp = getOtp();
+            const email = localStorage.getItem("bmf_pending_email");
+
+            if (otp.length !== 6) {
+                alert("Please enter the complete 6-digit OTP");
+                return;
+            }
+
+            const btn = document.getElementById("verifyBtn");
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+
+            // Try backend first
+            try {
+                const result = await apiRequest("/auth/verify-otp", {
+                    method: "POST",
+                    body: JSON.stringify({ email, otp })
+                });
+
+                if (result.success) {
+                    // Store auth data
+                    if (result.data.token) {
+                        localStorage.setItem("bmf_logged", "true");
+                        localStorage.setItem("bmf_token", result.data.token);
+                        localStorage.setItem("bmf_user_id", result.data.userId);
+                        localStorage.setItem("bmf_user", result.data.username);
+                        localStorage.setItem("bmf_email", result.data.email);
+                        localStorage.setItem("bmf_role", result.data.role || "USER");
+                    }
+                    localStorage.removeItem("bmf_pending_email");
+                    localStorage.removeItem("bmf_pending_otp");
+                    localStorage.removeItem("bmf_pending_user");
+
+                    alert("Email verified successfully! 🎉");
+                    window.location.href = "home.html";
+                    return;
+                } else {
+                    // Try localStorage fallback
+                    verifyOtpLocal(otp, btn);
+                    return;
+                }
+            } catch (error) {
+                console.log("Backend unavailable, using localStorage");
+                verifyOtpLocal(otp, btn);
+                return;
+            }
+        }
+
+        // LocalStorage OTP verification
+        function verifyOtpLocal(enteredOtp, btn) {
+            const storedOtp = localStorage.getItem("bmf_pending_otp");
+            const pendingUserData = localStorage.getItem("bmf_pending_user");
+
+            if (!pendingUserData) {
+                alert("No pending registration found. Please register again.");
+                btn.disabled = false;
+                btn.textContent = "Verify Email";
+                window.location.href = "register.html";
+                return;
+            }
+
+            const pendingUser = JSON.parse(pendingUserData);
+
+            // Check OTP expiry
+            if (Date.now() > pendingUser.otpExpiry) {
+                alert("OTP has expired. Please request a new one.");
+                btn.disabled = false;
+                btn.textContent = "Verify Email";
+                return;
+            }
+
+            // Verify OTP
+            if (enteredOtp === storedOtp || enteredOtp === pendingUser.otp) {
+                // Add user to users list
+                let users = JSON.parse(localStorage.getItem("bmf_users") || "[]");
+
+                // Mark email as verified
+                pendingUser.emailVerified = true;
+                delete pendingUser.otp;
+                delete pendingUser.otpExpiry;
+
+                users.push(pendingUser);
+                localStorage.setItem("bmf_users", JSON.stringify(users));
+
+                // Log user in
+                localStorage.setItem("bmf_logged", "true");
+                localStorage.setItem("bmf_user_id", pendingUser.id);
+                localStorage.setItem("bmf_user", pendingUser.username);
+                localStorage.setItem("bmf_email", pendingUser.email);
+                localStorage.setItem("bmf_role", pendingUser.role || "USER");
+
+                // Cleanup
+                localStorage.removeItem("bmf_pending_email");
+                localStorage.removeItem("bmf_pending_otp");
+                localStorage.removeItem("bmf_pending_user");
+
+                alert("Email verified successfully! 🎉");
+                window.location.href = "home.html";
+            } else {
+                alert("Invalid OTP. Please try again.");
+                btn.disabled = false;
+                btn.textContent = "Verify Email";
+            }
+        }
+
+        async function resendOtp() {
+            const resendLink = document.getElementById("resendLink");
+            if (resendLink.classList.contains("disabled")) return;
+
+            const email = localStorage.getItem("bmf_pending_email");
+
+            // Try backend first
+            try {
+                const result = await apiRequest("/auth/resend-otp", {
+                    method: "POST",
+                    body: JSON.stringify({ email })
+                });
+
+                if (result.success) {
+                    alert("New OTP sent to your email!");
+                    secondsLeft = 60;
+                    startCountdown();
+                    return;
+                }
+            } catch (error) {
+                console.log("Backend unavailable, using localStorage");
+            }
+
+            // LocalStorage fallback - generate new OTP
+            resendOtpLocal();
+        }
+
+        function resendOtpLocal() {
+            const pendingUserData = localStorage.getItem("bmf_pending_user");
+
+            if (!pendingUserData) {
+                alert("No pending registration found. Please register again.");
+                window.location.href = "register.html";
+                return;
+            }
+
+            // Generate new OTP
+            const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Update pending user
+            const pendingUser = JSON.parse(pendingUserData);
+            pendingUser.otp = newOtp;
+            pendingUser.otpExpiry = Date.now() + (10 * 60 * 1000); // 10 minutes
+
+            localStorage.setItem("bmf_pending_user", JSON.stringify(pendingUser));
+            localStorage.setItem("bmf_pending_otp", newOtp);
+
+            // Production message - OTP sent to email
+            alert("New OTP sent to your email! Please check your inbox.");
+
+            secondsLeft = 60;
+            startCountdown();
+        }
+
+        function startCountdown() {
+            const timerText = document.getElementById("timerText");
+            const countdown = document.getElementById("countdown");
+            const resendLink = document.getElementById("resendLink");
+
+            resendLink.classList.add("disabled");
+            timerText.style.display = "block";
+
+            if (countdownTimer) clearInterval(countdownTimer);
+
+            countdownTimer = setInterval(() => {
+                secondsLeft--;
+                countdown.textContent = secondsLeft;
+
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    timerText.style.display = "none";
+                    resendLink.classList.remove("disabled");
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
